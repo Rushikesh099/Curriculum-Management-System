@@ -13,6 +13,7 @@ COURSE GROUPING
 $compulsory = $courses->where('type','compulsory')->where('is_audit',0);
 $elective   = $courses->where('type','elective')->where('is_audit',0);
 $audit      = $courses->where('is_audit',1);
+$electiveGroups = $elective->groupBy('elective_group');
 
 
 /* ---------------------------
@@ -114,9 +115,7 @@ COMPULSORY COURSES
 @endforeach
 
 <td class="total">
-
 {{ $compulsory->sum('credits') }}
-
 </td>
 
 </tr>
@@ -159,7 +158,19 @@ ELECTIVE COURSES
 
 <td>
 
-@foreach(termCourses($elective,$year,$term) as $c)
+@foreach($electiveGroups as $group => $coursesGroup)
+
+@php
+$groupCourses = termCourses($coursesGroup,$year,$term);
+@endphp
+
+@if($groupCourses->count() > 0)
+
+<div style="font-weight:bold; margin-bottom:4px;">
+Elective {{ $group }}
+</div>
+
+@foreach($groupCourses as $c)
 
 <div class="course-block">
 
@@ -175,15 +186,17 @@ ELECTIVE COURSES
 
 @endforeach
 
+@endif
+
+@endforeach
+
 </td>
 
 @endforeach
 @endforeach
 
 <td>
-
 {{ $elective->sum('credits') }}
-
 </td>
 
 </tr>

@@ -186,6 +186,7 @@ public function storeCourses(Request $request, $schemeId, $levelId)
 
             'marks'   => $schemeLevel->is_audit ? 0 : ($courseData['exam_total'] ?? 0),
             'type' => $courseData['type'] ?? 'compulsory',
+            'elective_group' => $courseData['elective_group'] ?? null,
             'is_audit' => $schemeLevel->is_audit ? 1 : 0,
             'is_award' => isset($courseData['is_award']) ? 1 : 0,
         ]);

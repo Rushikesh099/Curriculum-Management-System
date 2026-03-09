@@ -37,6 +37,7 @@ return new class extends Migration
         $table->integer('tw_marks')->default(0);
         $table->integer('marks');
         $table->enum('type', ['compulsory', 'elective']);
+        $table->integer('elective_group')->nullable();
         $table->boolean('is_audit')->default(0);
         $table->boolean('is_award')->default(1);
         $table->timestamps();

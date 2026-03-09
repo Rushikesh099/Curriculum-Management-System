@@ -305,13 +305,124 @@ $totalExam += $course->marks;
 
 @endif
 
+@php
+$electiveGroups = \App\Models\Course::where('scheme_id', $scheme->id)
+    ->where('type','elective')
+    ->get()
+    ->groupBy('elective_group');
+@endphp
+
+<h4 class="mt-5 text-center fw-bold">
+ELECTIVE COURSES
+</h4>
+
+@foreach($electiveGroups as $group => $groupCourses)
+
+<div class="level-heading">
+<h4>Elective {{ $group }}</h4>
+</div>
+
+<table class="booklet-table">
+
+<thead>
+<tr>
+<th rowspan="3">Sr.<br>No.</th>
+<th rowspan="3">Course<br>Code</th>
+<th rowspan="3">Course Title</th>
+<th rowspan="3">Course<br>Abbr.</th>
+<th colspan="5">TEACHING SCHEME</th>
+<th colspan="7">EXAMINATION SCHEME</th>
+</tr>
+
+<tr>
+<th colspan="4">Hours per Week</th>
+<th rowspan="2">Total<br>Credits</th>
+<th colspan="2">Theory<br>Paper</th>
+<th rowspan="2">Test</th>
+<th rowspan="2">PR</th>
+<th rowspan="2">OR</th>
+<th rowspan="2">TW</th>
+<th rowspan="2">Total</th>
+</tr>
+
+<tr>
+<th>TH</th>
+<th>TU</th>
+<th>PR</th>
+<th>Total<br>Hours</th>
+<th>Hrs</th>
+<th>Marks</th>
+</tr>
+</thead>
+
+<tbody>
+
+@foreach($groupCourses as $i => $course)
+
+<tr>
+<td>{{ $sr++ }}</td>
+<td>{{ showValue($course->course_code) }}</td>
+<td class="text-left">{{ showValue($course->course_title) }}</td>
+<td>{{ showValue($course->Abbr) }}</td>
+
+<td>{{ showValue($course->th) }}</td>
+<td>{{ showValue($course->tu) }}</td>
+<td>{{ showValue($course->pr) }}</td>
+<td>{{ showValue($course->total_hours) }}</td>
+<td>{{ showValue($course->credits) }}</td>
+
+<td>{{ showValue($course->theory_hours) }}</td>
+<td>{{ showValue($course->theory_marks) }}</td>
+<td>{{ showValue($course->test_marks) }}</td>
+<td>{{ showValue($course->pr_marks) }}</td>
+<td>{{ showValue($course->or_marks) }}</td>
+<td>{{ showValue($course->tw_marks) }}</td>
+<td>{{ showValue($course->marks) }}</td>
+
+</tr>
+
+@endforeach
+
+<tr class="total-row">
+
+<td colspan="4"><strong>TOTAL</strong></td>
+
+<td>{{ showValue($groupCourses->sum('th')) }}</td>
+<td>{{ showValue($groupCourses->sum('tu')) }}</td>
+<td>{{ showValue($groupCourses->sum('pr')) }}</td>
+<td>{{ showValue($groupCourses->sum('total_hours')) }}</td>
+<td>{{ showValue($groupCourses->sum('credits')) }}</td>
+
+<td>{{ showValue($groupCourses->sum('theory_hours')) }}</td>
+<td>{{ showValue($groupCourses->sum('theory_marks')) }}</td>
+<td>{{ showValue($groupCourses->sum('test_marks')) }}</td>
+<td>{{ showValue($groupCourses->sum('pr_marks')) }}</td>
+<td>{{ showValue($groupCourses->sum('or_marks')) }}</td>
+<td>{{ showValue($groupCourses->sum('tw_marks')) }}</td>
+
+<td>
+{{ showValue(
+    $groupCourses->sum('theory_marks') +
+    $groupCourses->sum('test_marks') +
+    $groupCourses->sum('pr_marks') +
+    $groupCourses->sum('or_marks') +
+    $groupCourses->sum('tw_marks')
+) }}
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+@endforeach
+
 {{-- PAGE 18 STRUCTURE --}}
 <div class="page-break"></div>
 
 @php
-use App\Models\Course;
-
-$page18Courses = Course::where('scheme_id',$scheme->id)->get();
+$page18Courses = \App\Models\Course::where('scheme_id',$scheme->id)->get();
 @endphp
 
 @include('scheme.page18',[
@@ -384,6 +495,48 @@ background:#fff;
 
 }
 
+h5{
+font-weight:600;
+margin-top:25px;
+}
+
+.table{
+font-size:14px;
+}
+
+.scheme-table{
+font-size:14px;
+}
+
+.scheme-table th{
+text-align:center;
+vertical-align:middle;
+}
+.scheme-table th,
+.scheme-table td{
+border:1px solid #000;
+padding:6px;
+}
+
+.scheme-table td{
+text-align:center;
+}
+
+.scheme-table td.text-start{
+text-align:left;
+}
+
+.scheme-table{
+width:100%;
+border-collapse:collapse;
+font-size:14px;
+table-layout:fixed;
+}
+
+.scheme-table td{
+padding:6px;
+vertical-align:middle;
+}
 </style>
 
 @endsection
