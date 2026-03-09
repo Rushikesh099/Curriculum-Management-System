@@ -4,6 +4,8 @@ use App\Http\Controllers\SchemeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CourseController;
 
+use App\Http\Controllers\ProgrammeController;
+
 Route::get('/', function () {
     return redirect('/scheme/create');
 });
@@ -33,3 +35,7 @@ Route::get('/courses/edit/{id}', [CourseController::class,'edit'])->name('course
 Route::post('/courses/update/{id}', [CourseController::class,'update'])->name('courses.update');
 
 Route::delete('/courses/delete/{id}', [CourseController::class,'destroy'])->name('courses.delete');
+
+Route::get('/programmes',[ProgrammeController::class,'index'])->name('programmes.index');
+
+Route::delete('/programmes/{code}',[ProgrammeController::class,'destroy'])->name('programmes.destroy');
