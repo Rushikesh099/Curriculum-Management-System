@@ -79,11 +79,22 @@
             </div>
 
             <div class="col-md-2">
-                <label>Type</label>
-                <select name="courses[{{$i}}][type]" class="form-control">
-                    <option value="compulsory">Compulsory</option>
-                    <option value="elective">Elective</option>
-                </select>
+            <label>Type</label>
+            <select name="courses[{{$i}}][type]" class="form-control course-type">
+            <option value="compulsory">Compulsory</option>
+            <option value="elective">Elective</option>
+            </select>
+            </div>
+
+            <div class="col-md-3 elective-group-box" style="display:none;">
+            <label>Elective Type</label>
+            <select name="courses[{{$i}}][elective_group]" class="form-control">
+            <option value="">Select Type</option>
+            <option value="1">Elective 1</option>
+            <option value="2">Elective 2</option>
+            <option value="3">Elective 3</option>
+            <option value="4">Elective 4</option>
+            </select>
             </div>
 
             <div class="form-check mt-2">
@@ -301,6 +312,10 @@
 .table thead th {
     white-space: nowrap;
 }
+
+.elective-group-box{
+margin-top:22px;
+}
 </style>
 
 @endsection
@@ -471,6 +486,23 @@ document.addEventListener('DOMContentLoaded', function () {
             calculateRow(card);
             calculateLevelTotals();
         });
+    });
+    document.querySelectorAll(".course-type").forEach(select => {
+
+    select.addEventListener("change", function(){
+
+        let card = this.closest(".course-card");
+
+        let electiveBox = card.querySelector(".elective-group-box");
+
+        if(this.value === "elective"){
+            electiveBox.style.display = "block";
+        } else {
+            electiveBox.style.display = "none";
+        }
+
+    });
+
     });
 
 });
