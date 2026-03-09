@@ -283,13 +283,8 @@ public function page18($schemeId)
         'audit'
     ));
 }
-public function showCourses($programme_code)
-{
-    $scheme = Scheme::where('programme_code',$programme_code)->firstOrFail();
 
-    $courses = $scheme->courses;
 
-    return view('courses.index',compact('scheme','courses'));
-}
+
 
 }
