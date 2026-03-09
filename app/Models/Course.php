@@ -22,6 +22,7 @@ class Course extends Model
         'credits',
         'marks',
         'type',
+        'elective_group',
         'is_audit',
         'is_award'
     ];
