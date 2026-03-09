@@ -24,3 +24,5 @@ Route::get('/scheme/{scheme}/summary', [SchemeController::class, 'summary'])
 
 Route::get('/scheme/{scheme}/page18', [SchemeController::class, 'page18'])
     ->name('scheme.page18');
+
+    Route::get('/courses/{programme_code}', [SchemeController::class,'showCourses']);

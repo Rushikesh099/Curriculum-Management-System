@@ -25,6 +25,12 @@ class SchemeController extends Controller
     --------------------------*/
     public function store(Request $request)
     {
+        $request->validate([
+        'programme_code' => 'required|unique:schemes,programme_code'
+    ],[
+        'programme_code.unique' => 'This Programme Code already exists. Please use a different code.',
+        'programme_code.required' => 'Programme Code is required.'
+    ]);
         $scheme = Scheme::create([
             'programme_name' => $request->programme_name,
             'programme_code' => $request->programme_code,
@@ -119,6 +125,7 @@ public function storeCourses(Request $request, $schemeId, $levelId)
     $schemeLevel = SchemeLevel::where('scheme_id', $schemeId)
         ->where('id', $levelId)
         ->firstOrFail();
+    $scheme = Scheme::findOrFail($schemeId);
 
     $totalTH = 0;
     $totalTU = 0;
@@ -162,34 +169,41 @@ public function storeCourses(Request $request, $schemeId, $levelId)
     // ----------------------------
     foreach ($request->courses ?? [] as $courseData) {
 
-        Course::create([
-            'scheme_id' => $schemeId,
-            'scheme_level_id' => $schemeLevel->id,
+    $th = $courseData['th'] ?? 0;
+    $tu = $courseData['tu'] ?? 0;
+    $pr = $courseData['pr'] ?? 0;
 
-            'course_code' => $courseData['course_code'],
-            'course_title' => $courseData['course_title'],
-            'Abbr' => $courseData['abbr'] ?? null,
-            'year' => $courseData['year'] ?? null,
-            'term' => $courseData['term'] ?? null,
-            'th' => $courseData['th'] ?? 0,
-            'tu' => $courseData['tu'] ?? 0,
-            'pr' => $courseData['pr'] ?? 0,
-            'total_hours' => $courseData['total_hours'] ?? 0,
-            'credits' => $schemeLevel->is_audit ? 0 : ($courseData['credits'] ?? 0),
+    $total_hours = $th + $tu + $pr;
 
-            'theory_hours' => $courseData['theory_hours'] ?? 0,
-            'theory_marks' => $courseData['theory_marks'] ?? 0,
-            'test_marks' => $courseData['test_marks'] ?? 0,
-            'pr_marks' => $courseData['pr_marks'] ?? 0,
-            'or_marks' => $courseData['or_marks'] ?? 0,
-            'tw_marks' => $courseData['tw_marks'] ?? 0,
+    Course::create([
+        'scheme_id' => $schemeId,
+        'scheme_level_id' => $schemeLevel->id,
+        'programme_code' => $scheme->programme_code,
 
-            'marks'   => $schemeLevel->is_audit ? 0 : ($courseData['exam_total'] ?? 0),
-            'type' => $courseData['type'] ?? 'compulsory',
-            'is_audit' => $schemeLevel->is_audit ? 1 : 0,
-            'is_award' => isset($courseData['is_award']) ? 1 : 0,
+        'course_code' => $courseData['course_code'],
+        'course_title' => $courseData['course_title'],
+        'Abbr' => $courseData['abbr'] ?? null,
+
+        'year' => $courseData['year'] ?? null,
+        'term' => $courseData['term'] ?? null,
+
+        'th' => $th,
+        'tu' => $tu,
+        'pr' => $pr,
+
+        'total_hours' => $total_hours,
+
+        'credits' => $courseData['credits'] ?? 0,
+        'marks' => $courseData['marks'] ?? 0,
+
+        'type' => $courseData['type'] ?? 'compulsory',
+        'is_audit' => $courseData['is_audit'] ?? 0,
+        'is_award' => $courseData['is_award'] ?? 0,
         ]);
-    }
+
+}
+
+    
 
 
     // ----------------------------
@@ -265,6 +279,13 @@ public function page18($schemeId)
         'audit'
     ));
 }
+public function showCourses($programme_code)
+{
+    $scheme = Scheme::where('programme_code',$programme_code)->firstOrFail();
 
+    $courses = $scheme->courses;
+
+    return view('courses.index',compact('scheme','courses'));
 }
 
+}

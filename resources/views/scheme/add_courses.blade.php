@@ -87,12 +87,13 @@
             </div>
 
             <div class="form-check mt-2">
+                <label>
+                <input type="hidden" name="courses[{{$i}}][is_award]" value="0">
+
                 <input type="checkbox"
                     name="courses[{{$i}}][is_award]"
                     value="1"
                     class="form-check-input">
-
-                <label class="form-check-label">
                     Include in Award Class Calculation
                 </label>
             </div>

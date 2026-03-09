@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
         $table->id();
-
+        $table->string('programme_code');
         $table->foreignId('scheme_id')->constrained()->onDelete('cascade');
         $table->foreignId('scheme_level_id')
             ->constrained('scheme_levels')
             ->onDelete('cascade');
-
         $table->string('course_code');
         $table->string('course_title');
         $table->string('Abbr')->nullable();
@@ -38,7 +37,7 @@ return new class extends Migration
         $table->integer('marks');
         $table->enum('type', ['compulsory', 'elective']);
         $table->boolean('is_audit')->default(0);
-        $table->boolean('is_award')->default(1);
+        $table->boolean('is_award')->default(0);
         $table->timestamps();
         });
     }

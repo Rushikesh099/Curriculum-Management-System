@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Scheme extends Model
 {
-    protected $fillable = [
-    'programme_name',
-    'programme_code',
-    'year'
-];
+    use HasFactory;
 
-public function schemeLevels()
-{
-    return $this->hasMany(SchemeLevel::class);
-}
+    protected $fillable = [
+        'programme_name',
+        'programme_code',
+        'year'
+    ];
+
+    public function courses()
+    {
+        return $this->hasMany(Course::class,'programme_code','programme_code');
+    }
 }

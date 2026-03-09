@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('schemes', function (Blueprint $table) {
         $table->id();
         $table->string('programme_name');
-        $table->string('programme_code')->nullable();
+        $table->string('programme_code')->nullable()->unique();
         $table->year('year');
         $table->timestamps();
         });
