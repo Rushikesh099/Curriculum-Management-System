@@ -42,11 +42,44 @@
 
 @foreach($programmes as $index => $programme)
 
+@php
+$courseCount = \App\Models\Course::where('scheme_id', $programme->id)->count();
+$levelCount  = \App\Models\SchemeLevel::where('scheme_id', $programme->id)->count();
+$status = ($courseCount > 0 && $levelCount > 0) ? 'complete' : 'incomplete';
+@endphp
+
 <tr>
 
 <td>{{ $index+1 }}</td>
 
-<td>{{ $programme->programme_name }}</td>
+<td>
+{{ $programme->programme_name }}
+
+@if($courseCount > 0)
+
+<span class="badge bg-warning text-dark ms-1">
+{{ $levelCount }} Levels
+</span>
+
+<span class="badge bg-success ms-2">
+{{ $courseCount }} Courses
+</span>
+
+
+@else
+
+<span class="badge bg-secondary ms-2">
+No Levels
+</span>
+
+<span class="badge bg-secondary ms-2">
+No Courses
+</span>
+
+
+@endif
+
+</td>
 
 <td>{{ $programme->programme_code }}</td>
 

@@ -28,8 +28,8 @@
             <a class="navbar-brand" href="/">Scheme Management</a>
 
             <div>
-                <a href="/scheme/create" class="btn btn-sm btn-outline-light">
-                    Create Scheme
+                <a href="/programmes" class="btn btn-outline-light">
+                View Programmes
                 </a>
             </div>
         </div>
