@@ -367,30 +367,57 @@ document.addEventListener('DOMContentLoaded', function () {
     // ============================
     function calculateLevelTotals() {
 
-        let totalTH = 0, totalTU = 0, totalPR = 0;
-        let totalHours = 0, totalCredits = 0;
-        let totalMarks = 0;
+    let totalTH = 0, totalTU = 0, totalPR = 0;
+    let totalHours = 0, totalCredits = 0;
+    let totalMarks = 0;
 
-        document.querySelectorAll('.course-card').forEach(card => {
+    let sumTheory = 0;
+    let sumTest = 0;
+    let sumPRMarks = 0;
+    let sumOR = 0;
+    let sumTW = 0;
 
-            totalTH += Number(card.querySelector('.th-input')?.value) || 0;
-            totalTU += Number(card.querySelector('.tu-input')?.value) || 0;
-            totalPR += Number(card.querySelector('.pr-input')?.value) || 0;
+    document.querySelectorAll('.course-card').forEach(card => {
 
-            totalHours += Number(card.querySelector('.total-hours-input')?.value) || 0;
-            totalCredits += Number(card.querySelector('input[name*="[credits]"]')?.value) || 0;
-            totalMarks += Number(card.querySelector('.exam-total')?.value) || 0;
-        });
+        totalTH += Number(card.querySelector('.th-input')?.value) || 0;
+        totalTU += Number(card.querySelector('.tu-input')?.value) || 0;
+        totalPR += Number(card.querySelector('.pr-input')?.value) || 0;
 
-        document.getElementById('totalTH').innerText = totalTH;
-        document.getElementById('totalTU').innerText = totalTU;
-        document.getElementById('totalPR').innerText = totalPR;
-        document.getElementById('totalHours').innerText = totalHours;
-        document.getElementById('totalCredits').innerText = totalCredits;
-        document.getElementById('sumExamTotal').innerText = totalMarks;
+        totalHours += Number(card.querySelector('.total-hours-input')?.value) || 0;
+        totalCredits += Number(card.querySelector('input[name*="[credits]"]')?.value) || 0;
 
-        validateTotals(totalTH, totalTU, totalPR, totalCredits, totalMarks);
-    }
+        let theory = Number(card.querySelector('.theory-marks')?.value) || 0;
+        let test   = Number(card.querySelector('.test-marks')?.value) || 0;
+        let prMarks= Number(card.querySelector('.pr-marks')?.value) || 0;
+        let or     = Number(card.querySelector('.or-marks')?.value) || 0;
+        let tw     = Number(card.querySelector('.tw-marks')?.value) || 0;
+
+        sumTheory += theory;
+        sumTest += test;
+        sumPRMarks += prMarks;
+        sumOR += or;
+        sumTW += tw;
+
+        totalMarks += Number(card.querySelector('.exam-total')?.value) || 0;
+    });
+
+    // Teaching totals
+    document.getElementById('totalTH').innerText = totalTH;
+    document.getElementById('totalTU').innerText = totalTU;
+    document.getElementById('totalPR').innerText = totalPR;
+    document.getElementById('totalHours').innerText = totalHours;
+    document.getElementById('totalCredits').innerText = totalCredits;
+
+    // Examination totals
+    document.getElementById('sumTheory').innerText = sumTheory;
+    document.getElementById('sumTest').innerText = sumTest;
+    document.getElementById('sumPRMarks').innerText = sumPRMarks;
+    document.getElementById('sumOR').innerText = sumOR;
+    document.getElementById('sumTW').innerText = sumTW;
+    document.getElementById('sumExamTotal').innerText = totalMarks;
+
+    validateTotals(totalTH, totalTU, totalPR, totalCredits, totalMarks);
+}
 
     // ============================
     // 3️⃣ VALIDATION
