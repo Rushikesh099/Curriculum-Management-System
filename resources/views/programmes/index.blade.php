@@ -56,6 +56,11 @@
 See Courses
 </a>
 
+<a href="{{ route('scheme.summary', $programme->id) }}" 
+   class="btn btn-success btn-sm">
+View Summary
+</a>
+
 <form action="{{ route('programmes.destroy',$programme->programme_code) }}"
 method="POST"
 style="display:inline">
