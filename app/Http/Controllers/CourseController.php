@@ -26,9 +26,20 @@ class CourseController extends Controller
     }
 
     public function update(Request $request,$id)
-{
+    {
+        // ensure required/numeric inputs are sane
+        $request->validate([
+            'course_code'   => 'required|string|max:255',
+            'course_title'  => 'required|string|max:255',
+            'credits'       => 'nullable|numeric|min:0',
+            'th'            => 'nullable|numeric|min:0',
+            'tu'            => 'nullable|numeric|min:0',
+            'pr'            => 'nullable|numeric|min:0',
+            'total_hours'   => 'nullable|numeric|min:0',
+            'marks'         => 'nullable|numeric|min:0',
+        ]);
 
-    $course = Course::findOrFail($id);
+        $course = Course::findOrFail($id);
 
     $levelId = $course->scheme_level_id;
 
@@ -46,6 +57,40 @@ class CourseController extends Controller
             'credits'=>'Total credits of this level exceed allowed credits'
         ]);
 
+    }
+
+    // ------------------------------------------------------------------
+    // total hours exact-match validation (new requirement)
+    // ------------------------------------------------------------------
+    $currentHours = Course::where('scheme_level_id',$levelId)
+        ->where('id','!=',$id)
+        ->sum('total_hours');
+
+    $newTotalHours = $currentHours + $request->total_hours;
+    $remainingHours = $level->total_hours - $currentHours;
+
+    if ($newTotalHours !== $level->total_hours) {
+        return back()->withErrors([
+            'total_hours' => "Current hours assigned: {$currentHours} out of {$level->total_hours}. " .
+                              "You may only add up to {$remainingHours} more hours in this course."
+        ]);
+    }
+
+    // ------------------------------------------------------------------
+    // total marks exact-match validation (new requirement)
+    // ------------------------------------------------------------------
+    $currentMarks = Course::where('scheme_level_id',$levelId)
+        ->where('id','!=',$id)
+        ->sum('marks');
+
+    $newTotalMarks = $currentMarks + $request->marks;
+    $remainingMarks = $level->marks - $currentMarks;
+
+    if ($newTotalMarks !== $level->marks) {
+        return back()->withErrors([
+            'marks' => "Current marks assigned: {$currentMarks} out of {$level->marks}. " .
+                        "You may only add up to {$remainingMarks} more marks in this course."
+        ]);
     }
 
     // Basic fields
