@@ -28,16 +28,25 @@ class CourseController extends Controller
     public function update(Request $request,$id)
     {
         // ensure required/numeric inputs are sane
-        $request->validate([
-            'course_code'   => 'required|string|max:255',
-            'course_title'  => 'required|string|max:255',
-            'credits'       => 'nullable|numeric|min:0',
-            'th'            => 'nullable|numeric|min:0',
-            'tu'            => 'nullable|numeric|min:0',
-            'pr'            => 'nullable|numeric|min:0',
-            'total_hours'   => 'nullable|numeric|min:0',
-            'marks'         => 'nullable|numeric|min:0',
-        ]);
+        $rules = [
+            'course_code'  => 'required|string|max:255',
+            'course_title' => 'required|string|max:255',
+            // credit must be present and at least 1
+            'credits'      => 'required|numeric|min:1',
+            'th'           => 'nullable|numeric|min:0',
+            'tu'           => 'nullable|numeric|min:0',
+            'pr'           => 'nullable|numeric|min:0',
+            'total_hours'  => 'nullable|numeric|min:0',
+            'marks'        => 'nullable|numeric|min:0',
+        ];
+
+        $messages = [
+            'credits.required' => 'Credits field is required.',
+            'credits.numeric'  => 'Credits must be a number.',
+            'credits.min'      => 'Credits must be at least 1.',
+        ];
+
+        $request->validate($rules, $messages);
 
         $course = Course::findOrFail($id);
 

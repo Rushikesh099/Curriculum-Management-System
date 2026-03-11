@@ -127,6 +127,21 @@ public function storeCourses(Request $request, $schemeId, $levelId)
         ->firstOrFail();
     $scheme = Scheme::findOrFail($schemeId);
 
+    // per-course validation rules (applies to every row in the dynamic form)
+    $rules = [
+        'courses.*.course_code'  => 'required|string|max:255',
+        'courses.*.course_title' => 'required|string|max:255',
+        'courses.*.credits'      => 'required|numeric|min:1',
+        // other rules could go here if needed
+    ];
+
+    $messages = [
+        'courses.*.credits.required' => 'Each course must have a credit value.',
+        'courses.*.credits.min'      => 'Credits must be at least 1.',
+    ];
+
+    $request->validate($rules, $messages);
+
     $totalTH = 0;
     $totalTU = 0;
     $totalPR = 0;
