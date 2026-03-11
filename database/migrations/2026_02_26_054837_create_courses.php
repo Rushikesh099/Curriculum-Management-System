@@ -23,9 +23,9 @@ return new class extends Migration
         $table->string('Abbr')->nullable();
         $table->integer('year')->nullable();
         $table->enum('term', ['odd','even'])->nullable();
-        $table->integer('th');
+        $table->integer('th')->nullable();
         $table->integer('tu')->nullable();
-        $table->integer('pr');
+        $table->integer('pr')->nullable();
         $table->integer('total_hours');
         $table->integer('credits');
         $table->integer('theory_hours')->default(0);
