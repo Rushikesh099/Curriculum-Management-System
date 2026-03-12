@@ -92,7 +92,7 @@ class CourseController extends Controller
         if ($newTotalHours !== $level->total_hours) {
             return back()->withErrors([
                 'total_hours' => "Current hours assigned: {$currentHours} out of {$level->total_hours}. " .
-                    "You may only add up to {$remainingHours} more hours in this course."
+                    "You may exactly add {$remainingHours} hours in this course."
             ]);
         }
 
