@@ -131,14 +131,19 @@ public function storeCourses(Request $request, $schemeId, $levelId)
     $rules = [
         'courses.*.course_code'  => 'required|string|max:255',
         'courses.*.course_title' => 'required|string|max:255',
-        'courses.*.credits'      => 'required|numeric|min:1',
         // other rules could go here if needed
     ];
 
-    $messages = [
-        'courses.*.credits.required' => 'Each course must have a credit value.',
-        'courses.*.credits.min'      => 'Credits must be at least 1.',
-    ];
+    $messages = [];
+
+    // only enforce credit rule for non-audit levels
+    if (! $schemeLevel->is_audit) {
+        $rules['courses.*.credits'] = 'required|numeric|min:1';
+        $messages = [
+            'courses.*.credits.required' => 'Each course must have a credit value.',
+            'courses.*.credits.min'      => 'Credits must be at least 1.',
+        ];
+    }
 
     $request->validate($rules, $messages);
 

@@ -27,12 +27,13 @@ class CourseController extends Controller
 
     public function update(Request $request,$id)
     {
+        // load the course early so we know if it's an audit item
+        $course = Course::findOrFail($id);
+
         // ensure required/numeric inputs are sane
         $rules = [
             'course_code'  => 'required|string|max:255',
             'course_title' => 'required|string|max:255',
-            // credit must be present and at least 1
-            'credits'      => 'required|numeric|min:1',
             'th'           => 'nullable|numeric|min:0',
             'tu'           => 'nullable|numeric|min:0',
             'pr'           => 'nullable|numeric|min:0',
@@ -40,32 +41,41 @@ class CourseController extends Controller
             'marks'        => 'nullable|numeric|min:0',
         ];
 
-        $messages = [
-            'credits.required' => 'Credits field is required.',
-            'credits.numeric'  => 'Credits must be a number.',
-            'credits.min'      => 'Credits must be at least 1.',
-        ];
+        $messages = [];
+
+        // credits validation only applies to non-audit courses
+        if (!$course->is_audit) {
+            $rules['credits'] = 'required|numeric|min:1';
+            $messages = [
+                'credits.required' => 'Credits field is required.',
+                'credits.numeric'  => 'Credits must be a number.',
+                'credits.min'      => 'Credits must be at least 1.',
+            ];
+        }
 
         $request->validate($rules, $messages);
 
-        $course = Course::findOrFail($id);
+        // continue using the already-loaded $course
 
     $levelId = $course->scheme_level_id;
 
     $level = SchemeLevel::find($levelId);
 
-    $currentCredits = Course::where('scheme_level_id',$levelId)
-        ->where('id','!=',$id)
-        ->sum('credits');
+    // only perform the total-credit check for non-audit courses
+    if (! $course->is_audit) {
+        $currentCredits = Course::where('scheme_level_id',$levelId)
+            ->where('id','!=',$id)
+            ->sum('credits');
 
-    $newTotal = $currentCredits + $request->credits;
+        $newTotal = $currentCredits + $request->credits;
 
-    if($newTotal > $level->total_credits){
+        if($newTotal > $level->total_credits){
 
-        return back()->withErrors([
-            'credits'=>'Total credits of this level exceed allowed credits'
-        ]);
+            return back()->withErrors([
+                'credits'=>'Total credits of this level exceed allowed credits'
+            ]);
 
+        }
     }
 
     // ------------------------------------------------------------------
@@ -106,21 +116,23 @@ class CourseController extends Controller
     $course->course_code = $request->course_code;
     $course->course_title = $request->course_title;
     $course->Abbr = $request->Abbr;
-    $course->credits = $request->credits;
+    // if the course is audit we don't trust user input for credits
+    $course->credits = $course->is_audit ? 0 : $request->credits;
 
-    $course->th = $request->th;
-    $course->tu = $request->tu;
-    $course->pr = $request->pr;
-    $course->total_hours = $request->total_hours;
+    // ensure numeric fields never end up null (database columns are not nullable)
+    $course->th = $request->th ?? 0;
+    $course->tu = $request->tu ?? 0;
+    $course->pr = $request->pr ?? 0;
+    $course->total_hours = $request->total_hours ?? 0;
 
-    $course->theory_hours = $request->theory_hours;
-    $course->theory_marks = $request->theory_marks;
-    $course->test_marks = $request->test_marks;
-    $course->pr_marks = $request->pr_marks;
-    $course->or_marks = $request->or_marks;
-    $course->tw_marks = $request->tw_marks;
+    $course->theory_hours = $request->theory_hours ?? 0;
+    $course->theory_marks = $request->theory_marks ?? 0;
+    $course->test_marks = $request->test_marks ?? 0;
+    $course->pr_marks = $request->pr_marks ?? 0;
+    $course->or_marks = $request->or_marks ?? 0;
+    $course->tw_marks = $request->tw_marks ?? 0;
 
-    $course->marks = $request->marks;
+    $course->marks = $request->marks ?? 0;
 
 
     /*
@@ -129,7 +141,8 @@ class CourseController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    $course->type = $request->type;
+    // default to compulsory if not provided (shouldn't happen normally)
+    $course->type = $request->type ?? 'compulsory';
 
 
     /*
