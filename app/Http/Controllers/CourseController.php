@@ -68,11 +68,12 @@ class CourseController extends Controller
             ->sum('credits');
 
         $newTotal = $currentCredits + $request->credits;
+        $remainingCredits = $level->total_credits - $currentCredits;
 
-        if($newTotal > $level->total_credits){
+        if($newTotal !== $level->total_credits){
 
             return back()->withErrors([
-                'credits'=>'Total credits of this level exceed allowed credits'
+                'credits'=>"Total credits of this level not matched, allowed credits for this course is exactly {$remainingCredits}"
             ]);
 
         }
