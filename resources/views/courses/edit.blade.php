@@ -190,27 +190,12 @@
     </div>
 @endsection
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
 
-        const typeSelect = document.getElementById("type");
-        const electiveDiv = document.getElementById("electiveGroupDiv");
+    const typeSelect = document.getElementById("type");
+    const electiveDiv = document.getElementById("electiveGroupDiv");
 
-        if (typeSelect) {
-
-            function toggleElective() {
-
-                if (typeSelect.value === "elective") {
-                    electiveDiv.style.display = "block";
-                } else {
-                    electiveDiv.style.display = "none";
-                }
-
-            }
-
-            toggleElective();
-            typeSelect.addEventListener("change", toggleElective);
-
-        }
+    if (typeSelect) {
 
         function toggleElective() {
 
@@ -222,55 +207,66 @@
 
         }
 
-        // Page load check
         toggleElective();
-
-        // On change
         typeSelect.addEventListener("change", toggleElective);
+    }
 
-        // ----------------------------------------------------------------
-        // live computation helpers
-        // ----------------------------------------------------------------
-        function safeNumber(value) {
-            return parseFloat(value) || 0;
-        }
+    function safeNumber(value) {
+        return parseFloat(value) || 0;
+    }
 
-        const thInput = document.querySelector('input[name="th"]');
-        const tuInput = document.querySelector('input[name="tu"]');
-        const prInput = document.querySelector('input[name="pr"]');
-        const totalHoursInput = document.querySelector('input[name="total_hours"]');
+    const thInput = document.querySelector('input[name="th"]');
+    const tuInput = document.querySelector('input[name="tu"]');
+    const prInput = document.querySelector('input[name="pr"]');
+    const totalHoursInput = document.querySelector('input[name="total_hours"]');
 
-        const theoryInput = document.querySelector('input[name="theory_marks"]');
-        const testInput = document.querySelector('input[name="test_marks"]');
-        const prMarksInput = document.querySelector('input[name="pr_marks"]');
-        const orMarksInput = document.querySelector('input[name="or_marks"]');
-        const twMarksInput = document.querySelector('input[name="tw_marks"]');
-        const examTotalInput = document.querySelector('input[name="marks"]');
+    const theoryInput = document.querySelector('input[name="theory_marks"]');
+    const testInput = document.querySelector('input[name="test_marks"]');
+    const prMarksInput = document.querySelector('input[name="pr_marks"]');
+    const orMarksInput = document.querySelector('input[name="or_marks"]');
+    const twMarksInput = document.querySelector('input[name="tw_marks"]');
+    const examTotalInput = document.querySelector('input[name="marks"]');
 
-        function updateHours() {
-            if (!thInput || !tuInput || !prInput || !totalHoursInput) return;
-            totalHoursInput.value = safeNumber(thInput.value) +
-                safeNumber(tuInput.value) +
-                safeNumber(prInput.value);
-        }
+    function updateHours() {
 
-        function updateMarks() {
-            if (!theoryInput || !testInput || !prMarksInput || !orMarksInput || !twMarksInput || !
-                examTotalInput) return;
-            examTotalInput.value = safeNumber(theoryInput.value) +
-                safeNumber(testInput.value) +
-                safeNumber(prMarksInput.value) +
-                safeNumber(orMarksInput.value) +
-                safeNumber(twMarksInput.value);
-        }
+        if (!totalHoursInput) return;
 
-        [thInput, tuInput, prInput].forEach(el => el && el.addEventListener('input', updateHours));
-        [theoryInput, testInput, prMarksInput, orMarksInput, twMarksInput].forEach(el => el && el
-            .addEventListener('input', updateMarks));
+        let th = safeNumber(thInput?.value);
+        let tu = safeNumber(tuInput?.value);
+        let pr = safeNumber(prInput?.value);
 
-        // initialize on load
-        updateHours();
-        updateMarks();
+        totalHoursInput.value = th + tu + pr;
 
+    }
+
+    function updateMarks() {
+
+        if (!examTotalInput) return;
+
+        let theory = safeNumber(theoryInput?.value);
+        let test = safeNumber(testInput?.value);
+        let prMarks = safeNumber(prMarksInput?.value);
+        let or = safeNumber(orMarksInput?.value);
+        let tw = safeNumber(twMarksInput?.value);
+
+        examTotalInput.value = theory + test + prMarks + or + tw;
+
+    }
+
+    [thInput, tuInput, prInput].forEach(el => {
+        if (!el) return;
+        el.addEventListener('input', updateHours);
+        el.addEventListener('change', updateHours);
     });
+
+    [theoryInput, testInput, prMarksInput, orMarksInput, twMarksInput].forEach(el => {
+        if (!el) return;
+        el.addEventListener('input', updateMarks);
+    });
+
+    // Run once when page loads
+    updateHours();
+    updateMarks();
+
+});
 </script>
