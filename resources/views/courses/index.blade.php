@@ -1,71 +1,134 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="container booklet-container">
 
-<div class="container">
+        <h2 class="mb-4">
+            {{ $scheme->programme_name }} Courses
+        </h2>
 
-<h2 class="mb-4">
-{{ $scheme->programme_name }} Courses
-</h2>
+        @php
+            function showValue($value)
+            {
+                return $value === null || $value === '' || $value === 0 ? '--' : $value;
+            }
+        @endphp
 
+        @foreach ($levels as $schemeLevel)
+            <div class="level-heading">
+                {{ $schemeLevel->level_name }}
+            </div>
 
+            @php
+                $levelCourses = $courses[$schemeLevel->id] ?? collect();
+            @endphp
 
+            @if ($levelCourses->count() > 0)
+                <table class="booklet-table">
 
-<table class="table table-bordered table-striped">
+                    <thead>
 
-<thead class="table-dark">
+                        <tr>
+                            <th rowspan="3">Sr.<br>No.</th>
+                            <th rowspan="3">Course<br>Code</th>
+                            <th rowspan="3">Course Title</th>
+                            <th rowspan="3">Course<br>Abbr.</th>
 
-<tr>
-<th>Course Code</th>
-<th>Course Title</th>
-<th>Credits</th>
-<th>Action</th>
-</tr>
+                            <th colspan="5">TEACHING SCHEME</th>
 
-</thead>
+                            <th colspan="7">EXAMINATION SCHEME</th>
 
-<tbody>
+                            <th rowspan="3">Actions</th>
+                        </tr>
 
-@foreach($courses as $course)
+                        <tr>
+                            <th colspan="4">Hours per Week</th>
+                            <th rowspan="2">Total<br>Credits</th>
 
-<tr>
+                            <th colspan="2">Theory<br>Paper</th>
+                            <th rowspan="2">Test</th>
+                            <th rowspan="2">PR</th>
+                            <th rowspan="2">OR</th>
+                            <th rowspan="2">TW</th>
+                            <th rowspan="2">Total</th>
+                        </tr>
 
-<td>{{ $course->course_code }}</td>
+                        <tr>
+                            <th>TH</th>
+                            <th>TU</th>
+                            <th>PR</th>
+                            <th>Total<br>Hours</th>
 
-<td>{{ $course->course_title }}</td>
+                            <th>Hrs</th>
+                            <th>Marks</th>
+                        </tr>
 
-<td>{{ $course->credits }}</td>
+                    </thead>
 
-<td>
+                    <tbody>
 
-<a href="{{ route('courses.edit',$course->id) }}" class="btn btn-warning btn-sm">
-Edit
-</a>
+                        @foreach ($levelCourses as $i => $course)
+                            <tr>
 
-<form action="{{ route('courses.delete',$course->id) }}" method="POST" style="display:inline">
+                                <td>{{ $i + 1 }}</td>
 
-@csrf
-@method('DELETE')
+                                <td>{{ $course->course_code }}</td>
 
-<button class="btn btn-danger btn-sm"
-onclick="return confirm('Are you sure you want to delete this course?')">
+                                <td class="text-left">{{ $course->course_title }}</td>
 
-Delete
+                                <td>{{ $course->Abbr }}</td>
 
-</button>
+                                <td>{{ showValue($course->th) }}</td>
+                                <td>{{ showValue($course->tu) }}</td>
+                                <td>{{ showValue($course->pr) }}</td>
 
-</form>
+                                <td>{{ showValue($course->total_hours) }}</td>
 
-</td>
+                                <td>{{ showValue($course->credits) }}</td>
 
-</tr>
+                                <td>{{ showValue($course->theory_hours) }}</td>
+                                <td>{{ showValue($course->theory_marks) }}</td>
+                                <td>{{ showValue($course->test_marks) }}</td>
+                                <td>{{ showValue($course->pr_marks) }}</td>
+                                <td>{{ showValue($course->or_marks) }}</td>
+                                <td>{{ showValue($course->tw_marks) }}</td>
 
-@endforeach
+                                <td>{{ showValue($course->marks) }}</td>
 
-</tbody>
+                                <td>
 
-</table>
+                                    <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-warning btn-sm">
+                                        Edit </a>
 
-</div>
+                                    <form action="{{ route('courses.delete', $course->id) }}" method="POST"
+                                        style="display:inline">
 
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Are you sure you want to delete this course?')">
+
+                                            Delete
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+            @else
+                <div class="alert alert-warning">
+                    No courses found for this level.
+                </div>
+            @endif
+        @endforeach
+
+    </div>
 @endsection

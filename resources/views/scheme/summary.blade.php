@@ -3,6 +3,10 @@
 @section('content')
 
     @php
+        $isCoursePage = request()->routeIs('courses.*');
+    @endphp
+
+    @php
         function showValue($value)
         {
             return $value === null || $value === '' || $value === 0 ? '--' : $value;
@@ -32,13 +36,16 @@
                             <th rowspan="3">Course<br>Code</th>
                             <th rowspan="3">Course Title</th>
                             <th rowspan="3">Course<br>Abbr.</th>
-
                             @if ($level->is_audit)
                                 <th colspan="4">TEACHING SCHEME</th>
                             @else
                                 <th colspan="5">TEACHING SCHEME</th>
                                 <th colspan="7">EXAMINATION SCHEME</th>
                             @endif
+                            @if ($isCoursePage)
+                                <th rowspan="3">Actions</th>
+                            @endif
+
                         </tr>
 
                         <tr>
@@ -112,7 +119,6 @@
                                 <td>{{ showValue($course->course_code) }}</td>
                                 <td class="text-left">{{ showValue($course->course_title) }}</td>
                                 <td>{{ showValue($course->Abbr) }}</td>
-
                                 <td>{{ showValue($course->th) }}</td>
                                 <td>{{ showValue($course->tu) }}</td>
                                 <td>{{ showValue($course->pr) }}</td>
@@ -129,6 +135,24 @@
                                     <td>{{ showValue($course->marks) }}</td>
                                 @endif
 
+                                @if ($isCoursePage)
+                                    <td>
+                                        <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-warning btn-sm">
+                                            Edit
+                                        </a>
+
+                                        <form action="{{ route('courses.delete', $course->id) }}" method="POST"
+                                            style="display:inline">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Delete this course?')">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                @endif
                             </tr>
                         @endforeach
 
@@ -136,7 +160,6 @@
                         <tr class="total-row">
 
                             <td colspan="4"><strong>TOTAL</strong></td>
-
                             <td>{{ showValue($totalTH) }}</td>
                             <td>{{ showValue($totalTU) }}</td>
                             <td>{{ showValue($totalPR) }}</td>
@@ -151,6 +174,9 @@
                                 <td>{{ showValue($totalOR) }}</td>
                                 <td>{{ showValue($totalTW) }}</td>
                                 <td>{{ showValue($totalExam) }}</td>
+                            @endif
+                            @if ($isCoursePage)
+                                <td></td>
                             @endif
 
                         </tr>
@@ -300,108 +326,108 @@
         @endphp
 
         @if ($electiveGroups->count() > 0)
+            <h4 class="mt-5 text-center fw-bold">
+                ELECTIVE COURSES
+            </h4>
 
-        <h4 class="mt-5 text-center fw-bold">
-            ELECTIVE COURSES
-        </h4>
+            @foreach ($electiveGroups as $group => $groupCourses)
+                <div class="level-heading">
+                    <h4>Elective {{ $group }}</h4>
+                </div>
 
-        @foreach ($electiveGroups as $group => $groupCourses)
-            <div class="level-heading">
-                <h4>Elective {{ $group }}</h4>
-            </div>
+                <table class="booklet-table">
 
-            <table class="booklet-table">
-
-                <thead>
-                    <tr>
-                        <th rowspan="3">Sr.<br>No.</th>
-                        <th rowspan="3">Course<br>Code</th>
-                        <th rowspan="3">Course Title</th>
-                        <th rowspan="3">Course<br>Abbr.</th>
-                        <th colspan="5">TEACHING SCHEME</th>
-                        <th colspan="7">EXAMINATION SCHEME</th>
-                    </tr>
-
-                    <tr>
-                        <th colspan="4">Hours per Week</th>
-                        <th rowspan="2">Total<br>Credits</th>
-                        <th colspan="2">Theory<br>Paper</th>
-                        <th rowspan="2">Test</th>
-                        <th rowspan="2">PR</th>
-                        <th rowspan="2">OR</th>
-                        <th rowspan="2">TW</th>
-                        <th rowspan="2">Total</th>
-                    </tr>
-
-                    <tr>
-                        <th>TH</th>
-                        <th>TU</th>
-                        <th>PR</th>
-                        <th>Total<br>Hours</th>
-                        <th>Hrs</th>
-                        <th>Marks</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    @foreach ($groupCourses as $i => $course)
+                    <thead>
                         <tr>
-                            <td>{{ $sr++ }}</td>
-                            <td>{{ showValue($course->course_code) }}</td>
-                            <td class="text-left">{{ showValue($course->course_title) }}</td>
-                            <td>{{ showValue($course->Abbr) }}</td>
+                            <th rowspan="3">Sr.<br>No.</th>
+                            <th rowspan="3">Course<br>Code</th>
+                            <th rowspan="3">Course Title</th>
+                            <th rowspan="3">Course<br>Abbr.</th>
+                            <th colspan="5">TEACHING SCHEME</th>
+                            <th colspan="7">EXAMINATION SCHEME</th>
+                        </tr>
 
-                            <td>{{ showValue($course->th) }}</td>
-                            <td>{{ showValue($course->tu) }}</td>
-                            <td>{{ showValue($course->pr) }}</td>
-                            <td>{{ showValue($course->total_hours) }}</td>
-                            <td>{{ showValue($course->credits) }}</td>
+                        <tr>
+                            <th colspan="4">Hours per Week</th>
+                            <th rowspan="2">Total<br>Credits</th>
+                            <th colspan="2">Theory<br>Paper</th>
+                            <th rowspan="2">Test</th>
+                            <th rowspan="2">PR</th>
+                            <th rowspan="2">OR</th>
+                            <th rowspan="2">TW</th>
+                            <th rowspan="2">Total</th>
+                        </tr>
 
-                            <td>{{ showValue($course->theory_hours) }}</td>
-                            <td>{{ showValue($course->theory_marks) }}</td>
-                            <td>{{ showValue($course->test_marks) }}</td>
-                            <td>{{ showValue($course->pr_marks) }}</td>
-                            <td>{{ showValue($course->or_marks) }}</td>
-                            <td>{{ showValue($course->tw_marks) }}</td>
-                            <td>{{ showValue($course->marks) }}</td>
+                        <tr>
+                            <th>TH</th>
+                            <th>TU</th>
+                            <th>PR</th>
+                            <th>Total<br>Hours</th>
+                            <th>Hrs</th>
+                            <th>Marks</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach ($groupCourses as $i => $course)
+                            <tr>
+                                <td>{{ $sr++ }}</td>
+                                <td>{{ showValue($course->course_code) }}</td>
+                                <td class="text-left">{{ showValue($course->course_title) }}</td>
+                                <td>{{ showValue($course->Abbr) }}</td>
+
+                                <td>{{ showValue($course->th) }}</td>
+                                <td>{{ showValue($course->tu) }}</td>
+                                <td>{{ showValue($course->pr) }}</td>
+                                <td>{{ showValue($course->total_hours) }}</td>
+                                <td>{{ showValue($course->credits) }}</td>
+
+                                <td>{{ showValue($course->theory_hours) }}</td>
+                                <td>{{ showValue($course->theory_marks) }}</td>
+                                <td>{{ showValue($course->test_marks) }}</td>
+                                <td>{{ showValue($course->pr_marks) }}</td>
+                                <td>{{ showValue($course->or_marks) }}</td>
+                                <td>{{ showValue($course->tw_marks) }}</td>
+                                <td>{{ showValue($course->marks) }}</td>
+
+                            </tr>
+                        @endforeach
+
+                        <tr class="total-row">
+
+                            <td colspan="4"><strong>TOTAL</strong></td>
+
+                            <td>{{ showValue($groupCourses->sum('th')) }}</td>
+                            <td>{{ showValue($groupCourses->sum('tu')) }}</td>
+                            <td>{{ showValue($groupCourses->sum('pr')) }}</td>
+                            <td>{{ showValue($groupCourses->sum('total_hours')) }}</td>
+
+                            <td>{{ showValue($groupCourses->sum('credits')) }}</td>
+
+                            <td>{{ showValue($groupCourses->sum('theory_hours')) }}</td>
+                            <td>{{ showValue($groupCourses->sum('theory_marks')) }}</td>
+                            <td>{{ showValue($groupCourses->sum('test_marks')) }}</td>
+                            <td>{{ showValue($groupCourses->sum('pr_marks')) }}</td>
+                            <td>{{ showValue($groupCourses->sum('or_marks')) }}</td>
+                            <td>{{ showValue($groupCourses->sum('tw_marks')) }}</td>
+
+                            <td>
+                                {{ showValue(
+                                    $groupCourses->sum('theory_marks') +
+                                        $groupCourses->sum('test_marks') +
+                                        $groupCourses->sum('pr_marks') +
+                                        $groupCourses->sum('or_marks') +
+                                        $groupCourses->sum('tw_marks'),
+                                ) }}
+                            </td>
 
                         </tr>
-                    @endforeach
 
-                    <tr class="total-row">
+                    </tbody>
 
-                        <td colspan="4"><strong>TOTAL</strong></td>
-
-                        <td>{{ showValue($groupCourses->sum('th')) }}</td>
-                        <td>{{ showValue($groupCourses->sum('tu')) }}</td>
-                        <td>{{ showValue($groupCourses->sum('pr')) }}</td>
-                        <td>{{ showValue($groupCourses->sum('total_hours')) }}</td>
-                        <td>{{ showValue($groupCourses->sum('credits')) }}</td>
-
-                        <td>{{ showValue($groupCourses->sum('theory_hours')) }}</td>
-                        <td>{{ showValue($groupCourses->sum('theory_marks')) }}</td>
-                        <td>{{ showValue($groupCourses->sum('test_marks')) }}</td>
-                        <td>{{ showValue($groupCourses->sum('pr_marks')) }}</td>
-                        <td>{{ showValue($groupCourses->sum('or_marks')) }}</td>
-                        <td>{{ showValue($groupCourses->sum('tw_marks')) }}</td>
-
-                        <td>
-                            {{ showValue(
-                                $groupCourses->sum('theory_marks') +
-                                    $groupCourses->sum('test_marks') +
-                                    $groupCourses->sum('pr_marks') +
-                                    $groupCourses->sum('or_marks') +
-                                    $groupCourses->sum('tw_marks'),
-                            ) }}
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-        @endforeach
+                </table>
+            @endforeach
         @endif
 
         {{-- PAGE 18 STRUCTURE --}}
@@ -522,6 +548,15 @@
         .scheme-table td {
             padding: 6px;
             vertical-align: middle;
+        }
+
+        .booklet-table .btn {
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+
+        .booklet-table td:last-child {
+            white-space: nowrap;
         }
     </style>
 

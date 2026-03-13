@@ -14,9 +14,20 @@ class CourseController extends Controller
     {
         $scheme = Scheme::where('programme_code', $programme_code)->firstOrFail();
 
-        $courses = Course::where('programme_code', $programme_code)->get();
+        $levels = SchemeLevel::where('scheme_id', $scheme->id)
+            ->orderBy('id')
+            ->get();
 
-        return view('courses.index', compact('courses', 'scheme'));
+        $allCourses = Course::where('scheme_id', $scheme->id)->get();
+
+        $courses = $allCourses->groupBy('scheme_level_id');
+
+        return view('scheme.summary', compact(
+            'scheme',
+            'levels',
+            'courses',
+            'allCourses'
+        ));
     }
     public function edit($id)
     {
